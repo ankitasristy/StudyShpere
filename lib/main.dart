@@ -4,7 +4,7 @@ import 'package:study_sphere/splash_screen.dart';
 void main() {
   runApp(const StudySphereApp());
 }
-//Mrinmoy
+
 class StudySphereApp extends StatelessWidget {
   const StudySphereApp({super.key});
 
