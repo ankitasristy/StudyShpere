@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class QuizFeaturePage extends StatefulWidget {
-  const QuizFeaturePage({Key? key}) : super(key: key); // Corrected
+  const QuizFeaturePage({Key? key}) : super(key: key);
 
   @override
   State<QuizFeaturePage> createState() => _QuizFeaturePageState();
@@ -18,9 +18,11 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Quiz"),
-        centerTitle: true,
-        backgroundColor: secondaryColor,
+        title: const Text("Quiz",style: TextStyle(color: Colors.white,
+        fontSize: 20,fontWeight: FontWeight.bold,),
+      ),
+      centerTitle: true,
+      backgroundColor: secondaryColor,
       ),
       body: Center(
         child: buildUI(),
@@ -34,7 +36,7 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
     return resultUI();
   }
 
-  // ---------------- SUBJECT ----------------
+  // ---------------- SUBJECT SELECTION ----------------
   Widget subjectUI() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -50,7 +52,7 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: secondaryColor, // Correct property name
+          backgroundColor: secondaryColor,
           padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
         ),
         onPressed: () {
@@ -60,7 +62,10 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
             questionIndex = 1;
           });
         },
-        child: Text(title, style: const TextStyle(color: Colors.white, fontSize: 18)),
+        child: Text(
+          title,
+          style: const TextStyle(color: Colors.white, fontSize: 18),
+        ),
       ),
     );
   }
@@ -84,23 +89,39 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
         optionButton(),
         optionButton(),
         const SizedBox(height: 20),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: secondaryColor, // Correct property
-            padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-          ),
-          onPressed: () {
-            if (questionIndex < 5) {
-              setState(() {
-                questionIndex++;
-              });
-            } else {
-              setState(() {
-                currentStep = 2;
-              });
-            }
-          },
-          child: const Text("Next", style: TextStyle(color: Colors.white)),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // PREV BUTTON
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: secondaryColor),
+              onPressed: questionIndex > 1
+                  ? () {
+                setState(() {
+                  questionIndex--;
+                });
+              }
+                  : null, // disabled on first question
+              child: const Text("Prev", style: TextStyle(color: Colors.white)),
+            ),
+
+            // NEXT BUTTON
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: secondaryColor),
+              onPressed: () {
+                if (questionIndex < 5) {
+                  setState(() {
+                    questionIndex++;
+                  });
+                } else {
+                  setState(() {
+                    currentStep = 2; // show result
+                  });
+                }
+              },
+              child: const Text("Next", style: TextStyle(color: Colors.white)),
+            ),
+          ],
         ),
       ],
     );
@@ -115,12 +136,14 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
       ),
     );
   }
+
   // ---------------- RESULT ----------------
   Widget resultUI() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text("Result", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+        const Text("Result",
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
         const SizedBox(height: 20),
         const Text("Score will appear here"),
         const SizedBox(height: 30),

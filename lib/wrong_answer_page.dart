@@ -1,60 +1,92 @@
 import 'package:flutter/material.dart';
 
 class WrongAnswerPage extends StatefulWidget {
-  const WrongAnswerPage({super.key});
+  const WrongAnswerPage({Key? key}) : super(key: key);
 
   @override
   State<WrongAnswerPage> createState() => _WrongAnswerPageState();
 }
 
 class _WrongAnswerPageState extends State<WrongAnswerPage> {
-  final Color green = const Color(0xFF6B8E4E);
-
-  // Sample UI placeholders (no data)
-  List<int> placeholderQuestions = List.generate(5, (index) => index + 1); // just 5 placeholder items
+  final Color secondaryColor = const Color(0xFF6B8E4E);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Wrong Answers"),
+        title: const Text(
+          "Wrong Answers",
+          style: TextStyle(color: Colors.white),
+        ),
         centerTitle: true,
-        backgroundColor: green,
+        backgroundColor: secondaryColor,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: placeholderQuestions.isEmpty
-            ? const Center(child: Text("No wrong answers yet", style: TextStyle(fontSize: 18)))
-            : ListView.builder(
-          itemCount: placeholderQuestions.length,
-          itemBuilder: (context, index) {
-            return Card(
-              margin: const EdgeInsets.only(bottom: 15),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              elevation: 3,
-              child: ListTile(
-                title: const Text("Question will appear here"),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    SizedBox(height: 5),
-                    Text("Option A"),
-                    Text("Option B"),
-                    Text("Option C"),
-                    Text("Option D"),
-                  ],
+      body: wrongAnswerListUI(),
+    );
+  }
+
+  Widget wrongAnswerListUI() {
+    // Placeholder: show 3 empty cards to demo UI
+    return ListView.builder(
+      padding: const EdgeInsets.all(20),
+      itemCount: 3, // just for UI demonstration
+      itemBuilder: (context, index) {
+        return wrongAnswerCard();
+      },
+    );
+  }
+
+  Widget wrongAnswerCard() {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 3,
+      margin: const EdgeInsets.only(bottom: 15),
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Question placeholder
+            const Text(
+              "Question will come from Firebase",
+              style: TextStyle(
+                  fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
+            ),
+            const SizedBox(height: 8),
+
+            // Wrong Answer placeholder
+            const Text(
+              "Your Answer: (User's wrong answer)",
+              style: TextStyle(fontSize: 14, color: Colors.red),
+            ),
+            const SizedBox(height: 4),
+
+            // Correct Answer placeholder
+            const Text(
+              "Correct Answer: (Correct answer from Firebase)",
+              style: TextStyle(fontSize: 14, color: Colors.green),
+            ),
+            const SizedBox(height: 10),
+
+            // Delete button placeholder
+            Align(
+              alignment: Alignment.centerRight,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: secondaryColor,
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () {
-                    setState(() {
-                      placeholderQuestions.removeAt(index); // UI-only delete
-                    });
-                  },
+                onPressed: () {
+                  // Firebase delete functionality will be implemented later
+                },
+                child: const Text(
+                  "Delete",
+                  style: TextStyle(color: Colors.white),
                 ),
               ),
-            );
-          },
+            ),
+          ],
         ),
       ),
     );
