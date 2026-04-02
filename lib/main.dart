@@ -3,7 +3,7 @@ import 'package:study_sphere/splash_screen.dart';
 
 void main() {
   runApp(const StudySphereApp());
-  
+  67890
 }
 class StudySphereApp extends StatelessWidget {
   const StudySphereApp({super.key});
