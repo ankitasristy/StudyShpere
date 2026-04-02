@@ -35,27 +35,6 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: const Color(0xFF5A8A3D),
         title: Text('StudySphere', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(color: Color(0xFF5A8A3D)),
-              child: Text('More', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-            ),
-            ListTile(
-              leading: Icon(Icons.quiz_outlined, color: Color(0xFF5A8A3D)),
-              title: Text('Quiz'),
-              onTap: () => _navigate(QuizFeaturePage()),
-            ),
-            ListTile(
-              leading: Icon(Icons.receipt_outlined, color: Color(0xFF5A8A3D)),
-              title: Text('Wrong Answers'),
-              onTap: () => _navigate(WrongAnswerPage()),
-            ),
-          ],
-        ),
-      ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
@@ -67,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() => _selectedIndex = i);
         },
         selectedItemColor: const Color(0xFF5A8A3D),
-        unselectedItemColor: Colors.grey,
+        unselectedItemColor: const Color(0xFF5A8A3D),
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),
@@ -90,52 +69,8 @@ class _HomePage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Good Morning', style: TextStyle(fontSize: 13, color: Colors.grey)),
-          Text('Noshin Mahi', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF2D5A1E))),
-          SizedBox(height: 20),
-
-          // Progress (Only for ui)
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: const Color(0xFF5A8A3D), borderRadius: BorderRadius.circular(12)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Today's Progress", style: TextStyle(color: Colors.white70, fontSize: 13)),
-                SizedBox(height: 6),
-                Text('72% Daily Goal', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                SizedBox(height: 10),
-                LinearProgressIndicator(
-                  value: 0.72,
-                  minHeight: 8,
-                  borderRadius: BorderRadius.circular(99),
-                  backgroundColor: Colors.white24,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-                SizedBox(height: 12),
-                Row(children: [
-                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('5', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                    Text('Day Streak', style: TextStyle(color: Colors.white60, fontSize: 11)),
-                  ]),
-                  SizedBox(width: 20),
-                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('2', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                    Text('Sessions', style: TextStyle(color: Colors.white60, fontSize: 11)),
-                  ]),
-                  SizedBox(width: 20),
-                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('14', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                    Text('Cards Done', style: TextStyle(color: Colors.white60, fontSize: 11)),
-                  ]),
-                ]),
-              ],
-            ),
-          ),
-
           SizedBox(height: 24),
-          Text('Features', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2D5A1E))),
+          Text('Features', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Color(0xFF2D5A1E))),
           SizedBox(height: 12),
 
           Expanded(
