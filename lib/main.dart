@@ -3,7 +3,6 @@ import 'package:study_sphere/splash_screen.dart';
 
 void main() {
   runApp(const StudySphereApp());
-
   
 }
 class StudySphereApp extends StatelessWidget {
