@@ -25,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.amber//const Color(0xFF5A8A3D),
+        backgroundColor: Colors.white//const Color(0xFF5A8A3D),
 
       ),
       body: Padding(
