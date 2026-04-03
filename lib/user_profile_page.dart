@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class UserProfilePage extends StatelessWidget {
   const UserProfilePage({super.key});
 
-  final Color secondaryColor = const Color(0xFF6B8E4E); // secondary color
+  final Color secondaryColor = const Color(0xFF5A8A3D); // secondary color
 
   @override
   Widget build(BuildContext context) {

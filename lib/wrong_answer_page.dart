@@ -8,7 +8,7 @@ class WrongAnswerPage extends StatefulWidget {
 }
 
 class _WrongAnswerPageState extends State<WrongAnswerPage> {
-  final Color secondaryColor = const Color(0xFF6B8E4E);
+  final Color secondaryColor = const Color(0xFF5A8A3D);
 
   @override
   Widget build(BuildContext context) {

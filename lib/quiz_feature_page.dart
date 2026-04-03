@@ -8,7 +8,7 @@ class QuizFeaturePage extends StatefulWidget {
 }
 
 class _QuizFeaturePageState extends State<QuizFeaturePage> {
-  final Color secondaryColor = const Color(0xFF6B8E4E);
+  final Color secondaryColor = const Color(0xFF5A8A3D);
 
   int currentStep = 0; // 0=Subject, 1=Question, 2=Result
   String selectedSubject = "";
