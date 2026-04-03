@@ -3,88 +3,54 @@ import 'package:flutter/material.dart';
 import 'reminder.dart';
 
 class PomodoroTimer extends StatefulWidget {
-  final VoidCallback onStop;
-  const PomodoroTimer({super.key, required this.onStop});
+  const PomodoroTimer({super.key});
 
   @override
   State<PomodoroTimer> createState() => _PomodoroTimerState();
 }
 
 class _PomodoroTimerState extends State<PomodoroTimer> {
-  int _secondsRemaining = 10;
-  bool _isBreak = false;
-  Timer? _timer;
+  int _s = 10;
+  Timer? _t;
+  Timer? _reminderTimer; // New timer specifically for the repeat reminders
 
-  @override
-  void initState() {
-    super.initState();
-    _startTimer();
+  void _toggle() {
+    if (_t?.isActive ?? false) {
+      _t?.cancel();
+      // Start the repeating 10-second reminder immediately after stopping
+      _startRepeatingReminder();
+    } else {
+      _reminderTimer?.cancel(); // Stop reminders if we start the timer again
+      _s = 10;
+      _t = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (!mounted) return;
+        setState(() => _s > 0 ? _s-- : _toggle());
+      });
+    }
+    setState(() {});
   }
 
-  void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (mounted) {
-        setState(() {
-          if (_secondsRemaining > 0) {
-            _secondsRemaining--;
-          } else {
-            _isBreak = !_isBreak;
-            _secondsRemaining = _isBreak ? 5 : 10;
-          }
-        });
-      }
+  void _startRepeatingReminder() {
+    _reminderTimer?.cancel();
+    _reminderTimer = Timer.periodic(const Duration(seconds: 10), (t) {
+      if (mounted) StudyReminder.show(context);
     });
   }
 
   @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final Color bgColor = _isBreak ? const Color(0xFFFFD1DC) : Colors.lightBlue;
-    final Color textColor = _isBreak ? Colors.redAccent : Colors.white;
-
     return Column(
       children: [
-        Container(
-          padding: const EdgeInsets.all(15),
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Column(
-            children: [
-              Text(
-                _isBreak ? 'BREAK' : 'STUDY',
-                style: TextStyle(
-                  fontSize: 20,
-                  color: textColor,
-                  fontWeight: FontWeight.bold,
-                  fontStyle: _isBreak ? FontStyle.italic : FontStyle.normal,
-                ),
-              ),
-              Text(
-                '$_secondsRemaining s',
-                style: TextStyle(fontSize: 28, color: textColor, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 5),
-        // THIS IS THE BUTTON YOU CLICK
-        TextButton(
-          onPressed: () {
-            // 1. Hide the timer widget immediately
-            widget.onStop();
-            // 2. Start the 10-second countdown for the reminder alert
-            StudyReminder.scheduleRevisionReminder(context);
-          },
-          child: const Text('STOP TIMER', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+        Text("$_s s", style: const TextStyle(fontSize: 50, fontWeight: FontWeight.bold, color: Color(0xFF5A8A3D))),
+        ElevatedButton(
+          onPressed: _toggle,
+          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF5A8A3D)),
+          child: Text(_t?.isActive == true ? "STOP" : "START", style: const TextStyle(color: Colors.white)),
         ),
       ],
     );
   }
+
+  @override
+  void dispose() { _t?.cancel(); _reminderTimer?.cancel(); super.dispose(); }
 }

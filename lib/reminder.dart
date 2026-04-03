@@ -1,34 +1,20 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 
 class StudyReminder {
+  static void show(BuildContext context) {
+    // We use a SnackBar or a non-blocking Dialog
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Time to revise!"),
+        backgroundColor: Color(0xFF2D5A1E),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
   static void scheduleRevisionReminder(BuildContext context) {
-    final navigator = Navigator.of(context);
-    Timer(const Duration(seconds: 10), () {
-      debugPrint("10 seconds are up! Showing the dialog...");
-      showDialog(
-        context: navigator.context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-            title: const Text(' Reminder'),
-            content: const Text(
-              'Time for you to revise the previous topic!!',
-              style: TextStyle(fontSize: 16),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text(
-                  'OK',
-                  style: TextStyle(color: Color(0xFF6B8E4E), fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
-          );
-        },
-      );
-    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Revision mode active!"), backgroundColor: Color(0xFF5A8A3D)),
+    );
   }
 }

@@ -1,188 +1,136 @@
-import 'timer.dart';
 import 'package:flutter/material.dart';
-import 'dart:ui';
-// Import the new timer file
+import 'timer.dart';
 
 class FlashcardScreen extends StatefulWidget {
-  const FlashcardScreen({super.key});
+  final bool useTimer;
+  const FlashcardScreen({super.key, this.useTimer = false});
 
   @override
   State<FlashcardScreen> createState() => _FlashcardScreenState();
 }
 
 class _FlashcardScreenState extends State<FlashcardScreen> {
-  final TextEditingController _countController = TextEditingController();
-  final PageController _pageController = PageController();
+  // Static final ensures cards stay in memory even when you leave the page
+  static final List<String> _cards = [];
+  final TextEditingController _ctrl = TextEditingController();
+  bool _isStudy = false;
+  int _index = 0;
+  final Color g = const Color(0xFF5A8A3D);
 
-  List<TextEditingController> _inputControllers = [];
-  List<String> _flashcards = [];
-
-  bool _isInputMode = true;
-  bool _showPomodoroChoice = false;
-  bool _isTimerActive = false;
-  int _currentPage = 0;
-
-  final Color secondaryGreen = const Color(0xFF6B8E4E);
-
-  void _generateInputFields() {
-    int? count = int.tryParse(_countController.text);
-    if (count != null && count > 0) {
-      setState(() {
-        _inputControllers = List.generate(count, (_) => TextEditingController());
-      });
-    }
-  }
-
-  void _askAboutPomodoro() {
-    setState(() {
-      _flashcards = _inputControllers
-          .map((c) => c.text)
-          .where((t) => t.trim().isNotEmpty)
-          .toList();
-
-      if (_flashcards.isNotEmpty) {
-        _isInputMode = false;
-        _showPomodoroChoice = true; // Show the YES/NO screen
-      }
-    });
+  @override
+  void initState() {
+    super.initState();
+    // If opened via Pomodoro button, go straight to study mode
+    if (widget.useTimer) _isStudy = true;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('FLASHCARDS', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: secondaryGreen,
-        foregroundColor: Colors.white,
+        title: Text(widget.useTimer ? "POMODORO" : "FLASHCARDS",
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        backgroundColor: g,
         centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: _buildBody(),
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            // Timer only appears in Pomodoro mode
+            if (widget.useTimer && _isStudy) ...[
+              const PomodoroTimer(),
+              const SizedBox(height: 20),
+            ],
+            Expanded(child: _isStudy ? _studyView() : _inputView()),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildBody() {
-    if (_isInputMode) return _buildInputForm();
-    if (_showPomodoroChoice) return _buildPomodoroChoice();
-    return _buildFlashcardView();
-  }
-
-  Widget _buildInputForm() {
+  Widget _inputView() {
     return Column(
       children: [
         TextField(
-          controller: _countController,
-          decoration: InputDecoration(
-            labelText: 'Number of flashcards',
-            focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: secondaryGreen, width: 2)),
-            border: const OutlineInputBorder(),
-          ),
-          keyboardType: TextInputType.number,
-          onChanged: (_) => _generateInputFields(),
+          controller: _ctrl,
+          decoration: InputDecoration(labelText: "Enter Card Text", labelStyle: TextStyle(color: g)),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 10),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: g),
+          onPressed: () => setState(() {
+            if (_ctrl.text.isNotEmpty) _cards.add(_ctrl.text);
+            _ctrl.clear();
+          }),
+          child: const Text("Add Card", style: TextStyle(color: Colors.white)),
+        ),
         Expanded(
-          child: ListView.builder(
-            itemCount: _inputControllers.length,
-            itemBuilder: (context, index) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: TextField(
-                controller: _inputControllers[index],
-                decoration: InputDecoration(labelText: 'Card ${index + 1}'),
+          child: ListView(
+            children: _cards.map((c) => ListTile(
+              title: Text(c, style: TextStyle(color: g)),
+              trailing: IconButton(
+                icon: const Icon(Icons.delete, color: Colors.red),
+                onPressed: () => setState(() => _cards.remove(c)),
               ),
-            ),
+            )).toList(),
           ),
         ),
-        if (_inputControllers.isNotEmpty)
-          SizedBox(
-            width: double.infinity,
-            height: 55,
-            child: ElevatedButton(
-              onPressed: _askAboutPomodoro,
-              style: ElevatedButton.styleFrom(backgroundColor: secondaryGreen),
-              child: const Text('Start Learning', style: TextStyle(color: Colors.white, fontSize: 18)),
-            ),
-          )
+        if (_cards.isNotEmpty)
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: g),
+            onPressed: () => setState(() => _isStudy = true),
+            child: const Text("Start Studying", style: TextStyle(color: Colors.white)),
+          ),
       ],
     );
   }
 
-  Widget _buildPomodoroChoice() {
+  Widget _studyView() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text("Enable Pomodoro Timer?", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+          Container(
+            width: double.infinity, height: 250,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: g, width: 3),
+            ),
+            alignment: Alignment.center,
+            padding: const EdgeInsets.all(20),
+            child: Text(
+              _cards.isEmpty ? "No cards added!" : _cards[_index],
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 26, color: g, fontWeight: FontWeight.bold),
+            ),
+          ),
           const SizedBox(height: 30),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () => setState(() { _isTimerActive = true; _showPomodoroChoice = false; }),
-                style: ElevatedButton.styleFrom(backgroundColor: secondaryGreen),
-                child: const Text("YES", style: TextStyle(color: Colors.white)),
-              ),
-              const SizedBox(width: 20),
-              ElevatedButton(
-                onPressed: () => setState(() { _isTimerActive = false; _showPomodoroChoice = false; }),
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
-                child: const Text("NO", style: TextStyle(color: Colors.white)),
-              ),
-            ],
-          )
+          if (_cards.isNotEmpty)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: g),
+                  onPressed: _index > 0 ? () => setState(() => _index--) : null,
+                  child: const Text("Prev", style: TextStyle(color: Colors.white)),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: g),
+                  onPressed: _index < _cards.length - 1 ? () => setState(() => _index++) : null,
+                  child: const Text("Next", style: TextStyle(color: Colors.white)),
+                ),
+              ],
+            ),
+          const SizedBox(height: 20),
+          TextButton(
+            onPressed: () => setState(() => _isStudy = false),
+            child: Text("Back to Editor", style: TextStyle(color: g)),
+          ),
         ],
       ),
     );
-  }
-
-  Widget _buildFlashcardView() {
-    return Column(
-      children: [
-        if (_isTimerActive) PomodoroTimer(onStop: () => setState(() => _isTimerActive = false)),
-        const SizedBox(height: 10),
-        Text('Card ${_currentPage + 1} of ${_flashcards.length}', style: TextStyle(color: secondaryGreen)),
-        Expanded(
-          child: ScrollConfiguration(
-            behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse, PointerDeviceKind.trackpad}),
-            child: PageView.builder(
-              controller: _pageController,
-              itemCount: _flashcards.length,
-              onPageChanged: (page) => setState(() => _currentPage = page),
-              itemBuilder: (context, index) => Center(
-                child: Container(
-                  width: double.infinity,
-                  height: 300,
-                  margin: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: secondaryGreen, width: 3),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(_flashcards[index], style: TextStyle(fontSize: 28, color: secondaryGreen, fontWeight: FontWeight.bold)),
-                ),
-              ),
-            ),
-          ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            ElevatedButton(onPressed: _currentPage == 0 ? null : () => _pageController.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.ease), child: const Text("Prev")),
-            ElevatedButton(onPressed: _currentPage == _flashcards.length - 1 ? null : () => _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.ease), child: const Text("Next")),
-          ],
-        ),
-      ],
-    );
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    _countController.dispose();
-    for (var c in _inputControllers) { c.dispose(); }
-    super.dispose();
   }
 }

@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import
+'package:flutter/material.dart';
 import 'quiz_feature_page.dart';
 import 'wrong_answer_page.dart';
 import 'user_profile_page.dart';
@@ -95,7 +96,7 @@ class _HomePage extends StatelessWidget {
                 ),
                 Card(
                   child: InkWell(
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => PomodoroTimer(onStop: () {}))),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FlashcardScreen(useTimer:true))),
                     child: Padding(
                       padding: EdgeInsets.all(14),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
