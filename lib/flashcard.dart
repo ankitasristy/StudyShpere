@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'timer.dart';
 
 class FlashcardScreen extends StatefulWidget {
@@ -10,18 +12,35 @@ class FlashcardScreen extends StatefulWidget {
 }
 
 class _FlashcardScreenState extends State<FlashcardScreen> {
-  // Static final ensures cards stay in memory even when you leave the page
-  static final List<String> _cards = [];
   final TextEditingController _ctrl = TextEditingController();
   bool _isStudy = false;
   int _index = 0;
   final Color g = const Color(0xFF5A8A3D);
 
+  // This points exactly to YOUR folder in the cloud
+  CollectionReference get _userCards => FirebaseFirestore.instance
+      .collection('users')
+      .doc(FirebaseAuth.instance.currentUser?.uid)
+      .collection('flashcards');
+
   @override
   void initState() {
     super.initState();
-    // If opened via Pomodoro button, go straight to study mode
     if (widget.useTimer) _isStudy = true;
+  }
+
+  Future<void> _addCard() async {
+    if (_ctrl.text.trim().isNotEmpty) {
+      await _userCards.add({
+        'text': _ctrl.text.trim(),
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+      _ctrl.clear();
+    }
+  }
+
+  Future<void> _deleteCard(String docId) async {
+    await _userCards.doc(docId).delete();
   }
 
   @override
@@ -38,46 +57,64 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            // Timer only appears in Pomodoro mode
             if (widget.useTimer && _isStudy) ...[
               const PomodoroTimer(),
               const SizedBox(height: 20),
             ],
-            Expanded(child: _isStudy ? _studyView() : _inputView()),
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: _userCards.orderBy('createdAt', descending: true).snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) return const Center(child: Text("Connection Error"));
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  final List<QueryDocumentSnapshot> docs = snapshot.data!.docs;
+
+                  return _isStudy ? _studyView(docs) : _inputView(docs);
+                },
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _inputView() {
+  Widget _inputView(List<QueryDocumentSnapshot> docs) {
     return Column(
       children: [
         TextField(
           controller: _ctrl,
-          decoration: InputDecoration(labelText: "Enter Card Text", labelStyle: TextStyle(color: g)),
+          decoration: InputDecoration(
+            labelText: "Enter Card Text",
+            labelStyle: TextStyle(color: g),
+          ),
         ),
         const SizedBox(height: 10),
         ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: g),
-          onPressed: () => setState(() {
-            if (_ctrl.text.isNotEmpty) _cards.add(_ctrl.text);
-            _ctrl.clear();
-          }),
+          onPressed: _addCard,
           child: const Text("Add Card", style: TextStyle(color: Colors.white)),
         ),
+        const SizedBox(height: 10),
         Expanded(
-          child: ListView(
-            children: _cards.map((c) => ListTile(
-              title: Text(c, style: TextStyle(color: g)),
-              trailing: IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red),
-                onPressed: () => setState(() => _cards.remove(c)),
-              ),
-            )).toList(),
+          child: ListView.builder(
+            itemCount: docs.length,
+            itemBuilder: (context, index) {
+              final data = docs[index].data() as Map<String, dynamic>;
+              return ListTile(
+                title: Text(data['text'] ?? '', style: TextStyle(color: g)),
+                trailing: IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () => _deleteCard(docs[index].id),
+                ),
+              );
+            },
           ),
         ),
-        if (_cards.isNotEmpty)
+        if (docs.isNotEmpty)
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: g),
             onPressed: () => setState(() => _isStudy = true),
@@ -87,50 +124,60 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
     );
   }
 
-  Widget _studyView() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: double.infinity, height: 250,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: g, width: 3),
-            ),
-            alignment: Alignment.center,
-            padding: const EdgeInsets.all(20),
-            child: Text(
-              _cards.isEmpty ? "No cards added!" : _cards[_index],
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 26, color: g, fontWeight: FontWeight.bold),
-            ),
+  Widget _studyView(List<QueryDocumentSnapshot> docs) {
+    if (docs.isEmpty) {
+      return Center(
+        child: TextButton(
+          onPressed: () => setState(() => _isStudy = false),
+          child: const Text("No cards! Click to add some."),
+        ),
+      );
+    }
+
+    if (_index >= docs.length) _index = 0;
+    final currentCard = docs[_index].data() as Map<String, dynamic>;
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          width: double.infinity, height: 250,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: g, width: 3),
           ),
-          const SizedBox(height: 30),
-          if (_cards.isNotEmpty)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: g),
-                  onPressed: _index > 0 ? () => setState(() => _index--) : null,
-                  child: const Text("Prev", style: TextStyle(color: Colors.white)),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: g),
-                  onPressed: _index < _cards.length - 1 ? () => setState(() => _index++) : null,
-                  child: const Text("Next", style: TextStyle(color: Colors.white)),
-                ),
-              ],
-            ),
-          const SizedBox(height: 20),
-          TextButton(
-            onPressed: () => setState(() => _isStudy = false),
-            child: Text("Back to Editor", style: TextStyle(color: g)),
+          alignment: Alignment.center,
+          padding: const EdgeInsets.all(20),
+          child: Text(
+            currentCard['text'] ?? '',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 24, color: g, fontWeight: FontWeight.bold),
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 30),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: g),
+              onPressed: _index > 0 ? () => setState(() => _index--) : null,
+              child: const Text("Prev", style: TextStyle(color: Colors.white)),
+            ),
+            Text("${_index + 1} / ${docs.length}"),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: g),
+              onPressed: _index < docs.length - 1 ? () => setState(() => _index++) : null,
+              child: const Text("Next", style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        TextButton(
+          onPressed: () => setState(() => _isStudy = false),
+          child: Text("Back to Editor", style: TextStyle(color: g)),
+        ),
+      ],
     );
   }
 }

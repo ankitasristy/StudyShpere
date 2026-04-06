@@ -3,17 +3,18 @@ import 'package:flutter/material.dart';
 class UserProfilePage extends StatelessWidget {
   const UserProfilePage({super.key});
 
-  final Color secondaryColor = const Color(0xFF5A8A3D); // secondary color
+  final Color secondaryColor = const Color(0xFF5A8A3D);
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // primary color
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
           "User Profile",
           style: TextStyle(
-            color: Colors.white, // AppBar title font color
+            color: Colors.white,
           ),
         ),
         backgroundColor: secondaryColor,
