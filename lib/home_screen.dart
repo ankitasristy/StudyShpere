@@ -18,10 +18,10 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
   final _pages = [
-    _HomePage(),
-    FlashcardScreen(),
-    Center(child: Text('Reminders', style: TextStyle(fontSize: 18, color: Colors.grey))),
-    UserProfilePage(),
+    const _HomePage(),
+    const FlashcardScreen(),
+    const Center(child: Text('Reminders', style: TextStyle(fontSize: 18, color: Colors.grey))),
+    const UserProfilePage(),
   ];
 
   void _navigate(Widget page) {
@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF5A8A3D),
-        title: Text('StudySphere', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text('StudySphere', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -70,26 +70,21 @@ class _HomePage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 24),
-          Text('Features', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Color(0xFF2D5A1E))),
-          SizedBox(height: 12),
+          const SizedBox(height: 24),
+          const Text('Features', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Color(0xFF2D5A1E))),
+          const SizedBox(height: 12),
 
           Expanded(
-            child: GridView.count(
-              crossAxisCount: 2,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 1.4,
+            child: ListView(
               children: [
                 Card(
                   child: InkWell(
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => FlashcardScreen())),
-                    child: Padding(
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FlashcardScreen())),
+                    child: const Padding(
                       padding: EdgeInsets.all(14),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Icon(Icons.style_outlined, color: Color(0xFF5A8A3D)),
                         Text('Flashcards', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                        Text('12 cards due', style: TextStyle(fontSize: 15, color: Colors.grey)),
                       ]),
                     ),
                   ),
@@ -97,7 +92,7 @@ class _HomePage extends StatelessWidget {
                 Card(
                   child: InkWell(
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FlashcardScreen(useTimer:true))),
-                    child: Padding(
+                    child: const Padding(
                       padding: EdgeInsets.all(14),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Icon(Icons.timer_outlined, color: Color(0xFF5A8A3D)),
@@ -109,26 +104,24 @@ class _HomePage extends StatelessWidget {
                 ),
                 Card(
                   child: InkWell(
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizFeaturePage())),
-                    child: Padding(
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QuizFeaturePage())),
+                    child: const Padding(
                       padding: EdgeInsets.all(14),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Icon(Icons.quiz_outlined, color: Color(0xFF5A8A3D)),
                         Text('Quiz', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                        Text('3 pending', style: TextStyle(fontSize: 15, color: Colors.grey)),
                       ]),
                     ),
                   ),
                 ),
                 Card(
                   child: InkWell(
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => WrongAnswerPage())),
-                    child: Padding(
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WrongAnswerPage())),
+                    child: const Padding(
                       padding: EdgeInsets.all(14),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Icon(Icons.receipt_outlined, color: Color(0xFF5A8A3D)),
                         Text('Wrong Answers', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                        Text('8 to review', style: TextStyle(fontSize: 15, color: Colors.grey)),
                       ]),
                     ),
                   ),

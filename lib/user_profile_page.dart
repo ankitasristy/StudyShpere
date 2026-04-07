@@ -1,13 +1,20 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:study_sphere/splash_screen.dart';
 
-class UserProfilePage extends StatelessWidget {
+class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});
 
-  final Color secondaryColor = const Color(0xFF5A8A3D);
+  @override
+  State<UserProfilePage> createState() => _UserProfilePageState();
+}
 
+class _UserProfilePageState extends State<UserProfilePage> {
+  final Color secondaryColor = const Color(0xFF5A8A3D);
 
   @override
   Widget build(BuildContext context) {
+    final User? currentUser = FirebaseAuth.instance.currentUser;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -34,11 +41,10 @@ class UserProfilePage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               // User Name
-              const Text(
-                "Hello, User!",
-                style: TextStyle(
+              Text(
+                currentUser!.email!,
+                style: const TextStyle(
                   fontSize: 22,
-                  fontWeight: FontWeight.bold,
                   color: Colors.black, // keep font color black
                 ),
               ),
@@ -52,8 +58,19 @@ class UserProfilePage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                onPressed: () {
-                  // Add log out functionality here
+                onPressed: () async {
+                  try {
+                    await FirebaseAuth.instance.signOut();
+
+                    if (context.mounted) {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context) => const SplashScreen()),
+                            (route) => false,
+                      );
+                    }
+                  } catch (e) {
+                    debugPrint("Error signing out: $e");
+                  }
                 },
                 child: const Text(
                   "Log Out",

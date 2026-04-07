@@ -22,10 +22,12 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
       appBar: AppBar(
         title: const Text(
           "Quiz",
-          style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         backgroundColor: secondaryColor,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Center(
         child: buildUI(),
@@ -116,7 +118,8 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text("Subject: $selectedSubject",
-              style: TextStyle(color: secondaryColor, fontWeight: FontWeight.bold)),
+              style: TextStyle(
+                  color: secondaryColor, fontWeight: FontWeight.bold)),
           const SizedBox(height: 10),
           Text("Question ${questionIndex + 1} / $totalQuestions"),
           const SizedBox(height: 20),
@@ -134,7 +137,8 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
               child: SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
-                  onPressed: () => checkAnswer(index, data['correctIndex'], totalQuestions),
+                  onPressed: () =>
+                      handleAnswerSelection(index, data, totalQuestions),   //ATTOJA
                   child: Text(options[index]),
                 ),
               ),
@@ -146,7 +150,8 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: secondaryColor),
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: secondaryColor),
                 onPressed: questionIndex > 0
                     ? () {
                   setState(() {
@@ -154,7 +159,8 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
                   });
                 }
                     : null,
-                child: const Text("Prev", style: TextStyle(color: Colors.white)),
+                child: const Text(
+                    "Prev", style: TextStyle(color: Colors.white)),
               ),
             ],
           ),
@@ -169,12 +175,16 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
       score++;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text("Correct!"), backgroundColor: Colors.green, duration: Duration(seconds: 1)),
+            content: Text("Correct!"),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 1)),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text("Wrong Answer!"), backgroundColor: Colors.red, duration: Duration(seconds: 1)),
+            content: Text("Wrong Answer!"),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 1)),
       );
     }
 
@@ -189,13 +199,30 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
     });
   }
 
+  // NEW FUNCTION (ATTOJA)
+  void handleAnswerSelection(int selectedIndex, Map<String, dynamic> data, int totalQuestions) {
+    int correctIndex = data['correctIndex'];
+    List options = data['options'] ?? [];
+
+    if (selectedIndex != correctIndex) {
+      FirebaseFirestore.instance.collection('wrong_answers').add({
+        'question': data['question'] ?? "N/A",
+        'userAnswer': options[selectedIndex] ?? "Unknown",
+        'correctAnswer': options[correctIndex] ?? "Unknown",
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    }
+    checkAnswer(selectedIndex, correctIndex, totalQuestions);
+  }
+
   // ---------------- PLACEHOLDER FOR FLUTTER ----------------
   Widget questionUIPlaceholder() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text("Subject: $selectedSubject",
-            style: TextStyle(color: secondaryColor, fontWeight: FontWeight.bold)),
+            style: TextStyle(
+                color: secondaryColor, fontWeight: FontWeight.bold)),
         const SizedBox(height: 10),
         const Text("Question 1 / 1"),
         const SizedBox(height: 20),
@@ -219,40 +246,56 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
   }
 
   Widget optionButtonPlaceholder() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 40),
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 40),
       child: OutlinedButton(
         onPressed: null,
-        child: const Text("Option"),
+        child: Text("Option"),
       ),
     );
   }
 
   // ---------------- RESULT ----------------
   Widget resultUI() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Text("Result", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 20),
-        Text("Your Score: $score", style: const TextStyle(fontSize: 20)),
-        const SizedBox(height: 30),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: secondaryColor,
-            padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-          ),
-          onPressed: () {
-            setState(() {
-              currentStep = 0;
-              selectedSubject = "";
-              questionIndex = 0;
-              score = 0;
-            });
-          },
-          child: const Text("Restart", style: TextStyle(color: Colors.white)),
-        ),
-      ],
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('questions')
+          .where('subject', isEqualTo: selectedSubject)
+          .snapshots(),
+      builder: (context, snapshot) {
+        int totalQuestions = snapshot.hasData ? snapshot.data!.docs.length : 0;
+
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text("Result",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
+            Text(
+              "Your Score: $score / $totalQuestions",
+              style: const TextStyle(fontSize: 20),
+            ),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: secondaryColor,
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 50, vertical: 15),
+              ),
+              onPressed: () {
+                setState(() {
+                  currentStep = 0;
+                  selectedSubject = "";
+                  questionIndex = 0;
+                  score = 0;
+                });
+              },
+              child: const Text(
+                  "Restart", style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
     );
   }
 }
