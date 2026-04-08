@@ -14,7 +14,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final User? currentUser = FirebaseAuth.instance.currentUser;
+    final currentUser = FirebaseAuth.instance.currentUser!;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -33,7 +33,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // User Avatar
               CircleAvatar(
                 radius: 50,
                 backgroundColor: secondaryColor,
@@ -45,14 +44,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 currentUser!.email!,
                 style: const TextStyle(
                   fontSize: 22,
-                  color: Colors.black, // keep font color black
+                  color: Colors.black,
                 ),
               ),
               const SizedBox(height: 50),
               // Log Out Button
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: secondaryColor, // matches app
+                  backgroundColor: secondaryColor,
                   minimumSize: const Size(double.infinity, 50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -75,7 +74,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 child: const Text(
                   "Log Out",
                   style: TextStyle(
-                    color: Colors.white, // font color white
+                    color: Colors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),

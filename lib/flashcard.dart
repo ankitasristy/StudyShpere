@@ -17,7 +17,6 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
   int _index = 0;
   final Color g = const Color(0xFF5A8A3D);
 
-  // This points exactly to YOUR folder in the cloud
   CollectionReference get _userCards => FirebaseFirestore.instance
       .collection('users')
       .doc(FirebaseAuth.instance.currentUser?.uid)
