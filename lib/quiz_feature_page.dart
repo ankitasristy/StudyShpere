@@ -80,10 +80,6 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
   //FIREBASE LOAader
   Widget firebaseQuestionLoader() {
     
-    /*if (selectedSubject == "Flutter") {
-      return questionUIPlaceholder();
-    }*/
-
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('questions')
