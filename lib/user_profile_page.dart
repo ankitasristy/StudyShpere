@@ -58,7 +58,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                onPressed: () async {
+                onPressed: () async {//attoja
                   try {
                     await FirebaseAuth.instance.signOut();
 

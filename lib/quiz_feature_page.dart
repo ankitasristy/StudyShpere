@@ -41,7 +41,7 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
     return resultUI();
   }
 
-  // ---------------- SUBJECT SELECTION ----------------
+  //  SUBJECT SELECTION
   Widget subjectUI() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -76,12 +76,12 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
     );
   }
 
-  // ---------------- FIREBASE LOADER ----------------
+  //FIREBASE LOAader
   Widget firebaseQuestionLoader() {
     // If Flutter is selected, show placeholder
-    if (selectedSubject == "Flutter") {
+    /*if (selectedSubject == "Flutter") {
       return questionUIPlaceholder();
-    }
+    }*/
 
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
@@ -108,7 +108,7 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
     );
   }
 
-  // ---------------- QUESTION UI FOR FIREBASE ----------------
+  //QUESTION UI FOR FIREBASE
   Widget questionUIFirebase(Map<String, dynamic> data, int totalQuestions) {
     List options = data['options'] ?? [];
 
@@ -152,13 +152,13 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                     backgroundColor: secondaryColor),
-                onPressed: questionIndex > 0
+                onPressed: /*questionIndex > 0
                     ? () {
                   setState(() {
                     questionIndex--;
                   });
                 }
-                    : null,
+                    :*/ null,
                 child: const Text(
                     "Prev", style: TextStyle(color: Colors.white)),
               ),
@@ -169,7 +169,7 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
     );
   }
 
-  // ---------------- CHECK ANSWER ----------------
+  // CHECK ANSWER
   void checkAnswer(int selected, dynamic correct, int totalQuestions) {
     if (selected == correct) {
       score++;
@@ -215,7 +215,7 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
     checkAnswer(selectedIndex, correctIndex, totalQuestions);
   }
 
-  // ---------------- PLACEHOLDER FOR FLUTTER ----------------
+  // PLACEHOLDER FOR FLUTTER
   Widget questionUIPlaceholder() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -255,7 +255,7 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
     );
   }
 
-  // ---------------- RESULT ----------------
+  //  RESULT
   Widget resultUI() {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
