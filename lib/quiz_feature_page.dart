@@ -75,11 +75,11 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
       ),
     );
   }
-  
+
 
   //FIREBASE LOAader
   Widget firebaseQuestionLoader() {
-    // If Flutter is selected, show placeholder
+    
     /*if (selectedSubject == "Flutter") {
       return questionUIPlaceholder();
     }*/
