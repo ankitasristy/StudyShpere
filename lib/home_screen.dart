@@ -1,11 +1,9 @@
-import
-'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'quiz_feature_page.dart';
 import 'wrong_answer_page.dart';
 import 'user_profile_page.dart';
 import 'flashcard.dart';
 import 'reminder.dart';
-import 'timer.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,11 +21,6 @@ class _HomeScreenState extends State<HomeScreen> {
     const Center(child: Text('Reminders', style: TextStyle(fontSize: 18, color: Colors.grey))),
     const UserProfilePage(),
   ];
-
-  void _navigate(Widget page) {
-    Navigator.pop(context);
-    Navigator.push(context, MaterialPageRoute(builder: (_) => page));
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,6 +82,7 @@ class _HomePage extends StatelessWidget {
                     ),
                   ),
                 ),
+                const SizedBox(height: 20),
                 Card(
                   child: InkWell(
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FlashcardScreen(useTimer:true))),
@@ -102,6 +96,7 @@ class _HomePage extends StatelessWidget {
                     ),
                   ),
                 ),
+                const SizedBox(height: 20),
                 Card(
                   child: InkWell(
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QuizFeaturePage())),
@@ -114,6 +109,7 @@ class _HomePage extends StatelessWidget {
                     ),
                   ),
                 ),
+                const SizedBox(height: 20),
                 Card(
                   child: InkWell(
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WrongAnswerPage())),
