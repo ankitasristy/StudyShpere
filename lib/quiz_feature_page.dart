@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class QuizFeaturePage extends StatefulWidget {
-  const QuizFeaturePage({Key? key}) : super(key: key);
+  const QuizFeaturePage({super.key});
 
   @override
   State<QuizFeaturePage> createState() => _QuizFeaturePageState();
@@ -204,10 +204,14 @@ class _QuizFeaturePageState extends State<QuizFeaturePage> {
   void handleAnswerSelection(int selectedIndex, Map<String, dynamic> data, int totalQuestions) {
     int correctIndex = data['correctIndex'];
     List options = data['options'] ?? [];
+    String questionText = data['question'] ?? "N/A";
 
     if (selectedIndex != correctIndex) {
-      FirebaseFirestore.instance.collection('wrong_answers').add({
-        'question': data['question'] ?? "N/A",
+      FirebaseFirestore.instance
+          .collection('wrong_answers')
+          .doc(questionText)
+          .set({
+        'question': questionText,
         'userAnswer': options[selectedIndex] ?? "Unknown",
         'correctAnswer': options[correctIndex] ?? "Unknown",
         'timestamp': FieldValue.serverTimestamp(),
